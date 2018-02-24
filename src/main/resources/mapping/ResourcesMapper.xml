@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo.mapper.ResourcesMapper" >
+  <resultMap id="BaseResultMap" type="com.example.demo.model.Resources" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="resUrl" property="resurl" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="parentId" property="parentid" jdbcType="INTEGER" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, resUrl, type, parentId, sort
+  </sql>
+
+  <select id="queryAll" resultType="com.example.demo.model.Resources">
+    SELECT id, name, resurl, type, parentid, sort
+    FROM resources
+    ORDER BY sort ASC
+  </select>
+
+  <select id="loadUserResources" parameterType="java.util.Map" resultType="com.example.demo.model.Resources">
+    SELECT
+        res.id, res.name, res.`resUrl`, res.`type`, res.`sort`
+    FROM resources res
+    LEFT JOIN role_resources rr
+    ON res.id = rr.`resourcesId`
+    LEFT JOIN user_role ur
+    ON ur.`roleId` = rr.`roleId`
+    WHERE ur.`userId` = #{userid}
+    <if test="type != null">
+      AND res.type = #{type}
+    </if>
+    GROUP BY res.id
+    ORDER BY res.`sort` ASC
+  </select>
+</mapper>
